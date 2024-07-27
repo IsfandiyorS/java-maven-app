@@ -17,7 +17,8 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>repackage</goal>
+                            <goal>repackage</goal> <!-- this is used to load all runtime dependencies to jar file during build it.
+                            It helps easily run application from jar file with its runtime dependencies -->
                         </goals>
                     </execution>
                 </executions>
