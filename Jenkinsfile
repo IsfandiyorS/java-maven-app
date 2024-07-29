@@ -1,55 +1,36 @@
-def gv 
-
 pipeline {
-    
     agent any
-    parameters {
-        choice(name: 'VERSION', choices: ['1.1.0', '1.2.0', '1.3.0'])
-        booleanParam(name: 'executeTests', defaultValue: true, description: '')
+    tools {
+        maven 'maven-3.9'
     }
-    
+
     stages {
-
-        stage("init"){
+        stage('build jar') {
             steps {
                 script {
-                    gv = load "script.groovy"
+                    echo 'build jar of application'
+                    sh 'mvn package'
                 }
             }
         }
-
-        stage("build") {
-            steps {
-               script {
-                    gv.buildApp()
-               }
-            }
-        }
-        stage("test") {
-            when {
-                expression {
-                    params.executeTests
-                }
-            }
+        stage('build image') {
             steps {
                 script {
-                    gv.testApp()
+                    echo 'build docker image of application'
+                    withCredentials([
+                        usernamePassword(credentials: 'docker-hub-repo', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD') 
+                    ]){
+                        sh 'docker build -t isfandiyors/maven-demo-app:jma-2.0 .'
+                        sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin" 
+                        sh 'docker push isfandiyors/maven-demo-app:jma-2.0'
+                    }
                 }
             }
         }
-        stage("deploy") {
-             input {
-                message "Select the environment to deploy to"
-                ok "Env selected"
-                parameters {
-                    choice(name: 'ENV', choices: ['dev', 'staging', 'production'], description: '')
-                }
-            }
-
+        stage('deploy') {
             steps {
                 script {
-                    gv.deployApp()
-                    echo "Deploying to ${ENV}"
+                    echo 'deploying application'
                 }
             }
         }
