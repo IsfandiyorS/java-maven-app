@@ -18,7 +18,7 @@ pipeline {
                 script {
                     echo 'build docker image of application'
                     withCredentials([
-                        usernamePassword(credentials: 'docker-hub-repo', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD') 
+                        usernamePassword(credentialsId: 'docker-hub-repo', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD') 
                     ]){
                         sh 'docker build -t isfandiyors/maven-demo-app:jma-2.0 .'
                         sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin" 
