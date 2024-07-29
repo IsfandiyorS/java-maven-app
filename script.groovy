@@ -6,7 +6,7 @@ def buildJar() {
 def buildImage() {
     echo 'building docker image of application'
     withCredentials([
-        usernamePassword(credentialsId: 'docker-hub-repo', usernameValue: 'USERNAME', passwordValue: 'PASSWORD')
+        usernamePassword(credentialsId: 'docker-hub-repo', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')
     ]) {
         sh 'docker build -t isfandiyors/maven-demo-app:jma-2.1 .'
         sh 'echo $PASSWORD | docker login  -u $USERNAME --password-stdin'
