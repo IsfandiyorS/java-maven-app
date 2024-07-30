@@ -1,16 +1,16 @@
 def buildJar() {
     echo 'building jar file of application'
-    sh 'mvn package'
+    sh 'mvn clean package'
 }
 
-def buildImage() {
+def buildImage(String IMAGE_VERSION) {
     echo 'building docker image of application'
     withCredentials([
         usernamePassword(credentialsId: 'docker-hub-repo', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')
     ]) {
-        sh 'docker build -t isfandiyors/maven-demo-app:jma-2.1 .'
+        sh "docker build -t isfandiyors/maven-demo-app:$IMAGE_VERSION ."
         sh 'echo $PASSWORD | docker login  -u $USERNAME --password-stdin'
-        sh 'docker push isfandiyors/maven-demo-app:jma-2.1'
+        sh "docker push isfandiyors/maven-demo-app:$IMAGE_VERSION"
     }
 }
 
