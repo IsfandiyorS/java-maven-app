@@ -8,6 +8,17 @@ pipeline {
     }
 
     stages {
+
+        stage('increment version') {
+            echo 'incrementing version ...'
+            sh 'mvn build-helper:parse-version versions:set \
+                -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} \
+                versions:commit'
+            def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+            def version = matcher[0][1]
+            env.IMAGE_NAME = "$version-$BUILD_NUMBER"
+        }
+
         stage('init') {
             steps {
                 script {
@@ -26,7 +37,7 @@ pipeline {
         stage('build image') {
             steps {
                 script {
-                    gv.buildImage()
+                    gv.buildImage(env.IMAGE_NAME)
                 }
             }
         }
